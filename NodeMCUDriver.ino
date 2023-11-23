@@ -40,7 +40,7 @@ void setup() {
 
   pinMode(Light_In_LED, OUTPUT);
   //default mode off
-  digitalWrite(Light_In_LED, HIGH);
+  digitalWrite(Light_In_LED, LOW);
 }
 
 void loop() {
@@ -50,13 +50,13 @@ void loop() {
     Serial.println("==========\nSensing");
 
     int i = 0;
+    r = 0, g = 0, b = 0, w = 0;
     for (i = 0; i < 10; i++) {
-      red[i] = tcs.colorRead('r', 100);
-      green[i] = tcs.colorRead('g', 100);
-      blue[i] = tcs.colorRead('b', 100);
-      white[i] = tcs.colorRead('c', 100);
+      red[i] = tcs.colorRead('r', 20);
+      green[i] = tcs.colorRead('g', 20);
+      blue[i] = tcs.colorRead('b', 20);
+      white[i] = tcs.colorRead('c', 20);
     }
-
     Serial.print("Processing");
     Serial.print(".");
     delay(1000);
@@ -76,6 +76,7 @@ void loop() {
     g /= 10;
     b /= 10;
     w /= 10;
+
     if ((int)w == 0)
       sum = 1;
     else
