@@ -21,28 +21,26 @@ Adafruit_NeoPixel pixels(Light_Out_Pixels, Light_Out_Pin, NEO_GRB + NEO_KHZ800);
 #define Button_Pin 16
 
 //Some extra variables
-int red[5];
-int green[5];
-int blue[5];
-int white[5];
+int red[10];
+int green[10];
+int blue[10];
+int white[10];
 uint32_t sum;
 float r, g, b, w;
 bool buttonState;
-int buttonRead;
 
 void setup() {
   Serial.begin(9600);
 
   pixels.begin();            //initialise pixels
   pixels.clear();            //Turn off all pixels
-  pixels.setBrightness(50);  //Set BRIGHTNESS to about 1/5 (max = 255), can adjust here
+  pixels.setBrightness(15);  //Set BRIGHTNESS to about 1/5 (max = 255), can adjust here
 
   pinMode(Button_Pin, INPUT);
-  buttonState = false;
 
   pinMode(Light_In_LED, OUTPUT);
   //default mode off
-  digitalWrite(Light_In_LED, LOW);
+  digitalWrite(Light_In_LED, HIGH);
 }
 
 void loop() {
@@ -52,7 +50,7 @@ void loop() {
     Serial.println("==========\nSensing");
 
     int i = 0;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < 10; i++) {
       red[i] = tcs.colorRead('r', 100);
       green[i] = tcs.colorRead('g', 100);
       blue[i] = tcs.colorRead('b', 100);
@@ -63,44 +61,66 @@ void loop() {
     Serial.print(".");
     delay(1000);
     Serial.print(".");
+
     //Hex code calculation
 
-    //Taking average of 5 values
-    r = red[0] + red[1] + red[2] + red[3] + red[4];
-    r = r / 5;
-    g = green[0] + green[1] + green[2] + green[3] + green[4];
-    g = g / 5;
-    b = blue[0] + blue[1] + blue[2] + blue[3] + blue[4];
-    b = b / 5;
-    w = white[0] + white[1] + white[2] + white[3] + white[4];
-    w = w / 5;
-    
-    sum = (w == 0) ? 1 : w;
+    //Taking average of 10 values
+    for (i = 0; i < 10; i++) {
+      r += red[i];
+      g += green[i];
+      b += blue[i];
+      w += white[i];
+    }
+
+    r /= 10;
+    g /= 10;
+    b /= 10;
+    w /= 10;
+    if ((int)w == 0)
+      sum = 1;
+    else
+      sum = w;
 
     r /= sum;
     g /= sum;
     b /= sum;
-    
+
     r *= 256;
     g *= 256;
     b *= 256;
-    
-    
+
     setColor((int)r, (int)g, (int)b);
     Serial.println(".");
     delay(500);
-    Serial.print("HEX: \t");
-    Serial.print((int)r, HEX);
-    Serial.print((int)g, HEX);
-    Serial.print((int)b, HEX);
 
-    Serial.print("\t \t RGB: \t");
-    Serial.print((int)r);
-    Serial.print(" ");
-    Serial.print((int)g);
-    Serial.print(" ");
-    Serial.println((int)b);
-    Serial.println();
+    if (r == 0 && g == 0 && b == 0 && w > 0) {
+      Serial.print("HEX: \t#FFFFFF");
+      Serial.print("\t \tRGB: \t255 255 255\n");
+    } else {
+      Serial.print("HEX: \t#");
+      if (r == 0)
+        Serial.print("00");
+      else
+        Serial.print((int)r, HEX);
+
+      if (g == 0)
+        Serial.print("00");
+      else
+        Serial.print((int)g, HEX);
+
+      if (b == 0)
+        Serial.print("00");
+      else
+        Serial.print((int)b, HEX);
+
+      Serial.print("\t \t RGB: \t");
+      Serial.print((int)r);
+      Serial.print(" ");
+      Serial.print((int)g);
+      Serial.print(" ");
+      Serial.println((int)b);
+      Serial.println();
+    }
     Serial.println("==========");
   }
 }
@@ -111,4 +131,3 @@ void setColor(int redValue, int greenValue, int blueValue) {
   pixels.show();
   delay(3000);
 }
-
