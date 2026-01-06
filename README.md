@@ -2,6 +2,7 @@
 
 Welcome to the ColorSense Wearable Project repository! This project features a hand-worn wearable device that detects colors from the environment and displays corresponding HEX codes. It's a creative fusion of technology and aesthetics.
 
+
 ## Table of Contents
 
 - [Features](#features)
